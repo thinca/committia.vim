@@ -14,26 +14,13 @@ let g:committia#git#cmd = get(g:, 'committia#git#cmd', 'git')
 let g:committia#git#diff_cmd = get(g:, 'committia#git#diff_cmd', 'diff -u --cached --no-color --no-ext-diff')
 let g:committia#git#status_cmd = get(g:, 'committia#git#status_cmd', '-c color.status=false status -b')
 
-try
-    silent call vimproc#version()
-
-    " Note: vimproc exists
-    function! s:system(cmd) abort
-        let out = vimproc#system(a:cmd)
-        if vimproc#get_last_status()
-            throw printf("Failed to execute command '%s': %s", a:cmd, out)
-        endif
-        return out
-    endfunction
-catch /^Vim\%((\a\+)\)\=:E117/
-    function! s:system(cmd) abort
-        let out = system(a:cmd)
-        if v:shell_error
-            throw printf("Failed to execute command '%s': %s", a:cmd, out)
-        endif
-        return out
-    endfunction
-endtry
+function! s:system(cmd) abort
+    let out = system(a:cmd)
+    if v:shell_error
+        throw printf("Failed to execute command '%s': %s", a:cmd, out)
+    endif
+    return out
+endfunction
 
 if !executable(g:committia#git#cmd)
     echoerr g:committia#git#cmd . ' command is not found. Please check g:committia#git#cmd'
